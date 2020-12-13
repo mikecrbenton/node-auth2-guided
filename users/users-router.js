@@ -2,10 +2,11 @@ const express = require("express")
 const bcrypt = require("bcryptjs")
 const Users = require("./users-model")
 const { restrict } = require("./users-middleware")
+const jwt = require("jsonwebtoken")
 
 const router = express.Router()
 
-router.get("/users", restrict(), async (req, res, next) => {
+router.get("/users", restrict("admin"), async (req, res, next) => {
 	try {
 		res.json(await Users.find())
 	} catch(err) {
@@ -55,13 +56,25 @@ router.post("/login", async (req, res, next) => {
 				message: "Invalid Credentials",
 			})
 		}
-
+      // USING JWT INSTEAD------------------
 		// generate a new session for this user,
 		// and sends back a session ID
-		req.session.user = user
+      //req.session.user = user
+      //------------------------------------
+
+      // jwt.sign( payload, secretOrPrivateKey, [options,callback])
+      const token = jwt.sign({ userID: user.id, userRole: user.role}, process.env.JWT_SECRET)
+
+      // OPTION TO SET JWT TO COOKIE=================================
+      // res.cookie("token", token)
+      // - If using this take the token out of res.json object below
+      //   a token will not come back in the body, but set in cookies
+      // ============================================================
+
 
 		res.json({
-			message: `Welcome ${user.username}!`,
+         message: `Welcome ${user.username}!`, 
+         token: token // TOKEN IS RETURNED IN THE RESPONSE BODY======
 		})
 	} catch(err) {
 		next(err)
