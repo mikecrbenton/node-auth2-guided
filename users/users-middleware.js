@@ -50,7 +50,7 @@ function restrict( role ) {
             next()
          })
 
-			//next() -> WITH JWT NEXT NEEDS TO BE WITHIN THE JWT BLOCK
+			//next() -> WITH JWT NEXT NEEDS TO BE WITHIN THE jwt.verify() BLOCK
 		} catch(err) {
 			next(err)
 		}
