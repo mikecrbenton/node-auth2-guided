@@ -15,7 +15,7 @@ function restrict( role ) {
          // }
          // -----------------------------------
 
-         // GET THE TOKEN VALUE FROM A MANUAL HEADER 
+         // GET THE TOKEN VALUE FROM A MANUAL REQUEST "HEADER" 
          const token = req.headers.authorization
 
          // USING COOKIE-PARSER / SAVING TO COOKIE======================= 
@@ -30,6 +30,7 @@ function restrict( role ) {
          // VERIFY SIGNATURES MATCH - DIDN'T CHANGE
          // jwt.verify(token, secretOrPublicKey,[options, callback])
          jwt.verify(token, process.env.JWT_SECRET, (err,decoded)=>{
+            // TOKEN DIDN'T VERIFY
             if(err){
                return res.status(401).json({ message:"Invalid Credentials"})
             }
@@ -42,12 +43,12 @@ function restrict( role ) {
                return res.status(401).json({ message:"Invalid Credentials"})
             }
 
-            // MAKE TOKEN AVAILABLE TO OTHER MIDDLEWARE OR ROUTE HANDLERS
+            // MAKE TOKEN'S PAYLOAD AVAILABLE TO OTHER MIDDLEWARE OR ROUTE HANDLERS
             req.token = decoded
             //console.log(decoded)
 
             // USER PASSED - CAN ALLOW ACCESS
-            next()
+            next() // make sure inside of the callback
          })
 
 			//next() -> WITH JWT NEXT NEEDS TO BE WITHIN THE jwt.verify() BLOCK

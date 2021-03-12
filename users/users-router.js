@@ -2,7 +2,7 @@ const express = require("express")
 const bcrypt = require("bcryptjs")
 const Users = require("./users-model")
 const { restrict } = require("./users-middleware")
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken") // 3rd party
 
 const router = express.Router()
 
@@ -27,8 +27,8 @@ router.post("/users", async (req, res, next) => {
 
 		const newUser = await Users.add({
 			username,
-			// hash the password with a time complexity of "14"
-			password: await bcrypt.hash(password, 14),
+			// hash the password with a time complexity set to the system (.env variable )
+			password: await bcrypt.hash(password, process.env.BCRYPT_TIME_COMPLEXITY),
 		})
 
 		res.status(201).json(newUser)
@@ -66,7 +66,7 @@ router.post("/login", async (req, res, next) => {
       const token = jwt.sign({ userID: user.id, userRole: user.role}, process.env.JWT_SECRET)
 
       // OPTION TO SET JWT TO COOKIE=================================
-      // res.cookie("token", token)
+      // res.cookie("token", token) // <-- THIS IS ALL YOU NEED TO SET A COOKIE
       // - If using this take the token out of res.json object below
       //   a token will not come back in the body, but set in cookies
       // ============================================================
